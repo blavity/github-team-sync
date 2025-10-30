@@ -76,12 +76,10 @@ jobs:
       # Create Google Workspace credentials file if needed
       ####################################
       - name: Create Google Workspace credentials file
-        if: env.USER_DIRECTORY == 'GOOGLE_WORKSPACE' && secrets.GOOGLE_WORKSPACE_SA_CREDS != ''
+        if: secrets.USER_DIRECTORY == 'GOOGLE_WORKSPACE' && secrets.GOOGLE_WORKSPACE_SA_CREDS != ''
         run: |
           echo "${{ secrets.GOOGLE_WORKSPACE_SA_CREDS }}" > googleAuth.json
           chmod 600 googleAuth.json
-        env:
-          USER_DIRECTORY: ${{ secrets.USER_DIRECTORY }}
 
       ####################################
       # Create syncmap.yml if configured
@@ -183,3 +181,4 @@ jobs:
         run: |
           rm -f .ssh/team-sync.pem
           rm -f googleAuth.json
+          rm -f syncmap.yml
