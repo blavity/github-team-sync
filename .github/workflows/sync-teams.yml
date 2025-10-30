@@ -39,6 +39,10 @@ jobs:
     name: Sync Teams
     runs-on: ubuntu-latest
     
+    # Limit permissions for security
+    permissions:
+      contents: read
+    
     steps:
       ##########################
       # Checkout the code base #
