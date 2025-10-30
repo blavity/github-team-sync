@@ -270,14 +270,62 @@ The custom map uses slugs that are lowercase. If you don't specify organization 
 
 ## Usage Examples
 
-### Start the application from Pipenv
+### Option 1: Run from GitHub Actions (Recommended)
+
+This approach runs the sync as a scheduled GitHub Actions workflow, eliminating the need for a persistent server.
+
+1. **Enable the workflow**: The workflow file is located at `.github/workflows/sync-teams.yml`
+
+2. **Configure GitHub Secrets**: In your repository settings, add the following secrets:
+
+   **Required secrets:**
+   - `APP_ID` - Your GitHub App ID
+   - `GITHUB_APP_PRIVATE_KEY` - Your GitHub App private key (entire PEM file content)
+   - `WEBHOOK_SECRET` - Webhook secret (can be any value when using Actions)
+   - `USER_DIRECTORY` - Backend type (e.g., `GOOGLE_WORKSPACE`, `LDAP`, `AAD`, `OKTA`)
+
+   **For Google Workspace:**
+   - `GOOGLE_WORKSPACE_SA_CREDS` - Service account credentials JSON file content
+   - `GOOGLE_WORKSPACE_ADMIN_EMAIL` - Admin email for impersonation
+   - `GOOGLE_WORKSPACE_USERNAME_CUSTOM_SCHEMA_NAME` - Custom schema name (if syncing by username)
+   - `GOOGLE_WORKSPACE_USERNAME_FIELD` - Custom field name (if syncing by username)
+   - `USER_SYNC_ATTRIBUTE` - Set to `username` or `email`
+
+   **For LDAP/Active Directory:**
+   - `LDAP_SERVER_HOST`, `LDAP_SERVER_PORT`, `LDAP_BASE_DN`, etc. (see `.env.example.ldap`)
+
+   **For Azure AD:**
+   - `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET`, etc. (see `.env.example.aad`)
+
+   **For Okta:**
+   - `OKTA_ORG_URL`, `OKTA_ACCESS_TOKEN`, etc. (see `.env.example.okta`)
+
+   **Optional secrets:**
+   - `GHE_HOST` - GitHub Enterprise hostname (omit for github.com)
+   - `CHANGE_THRESHOLD` - Maximum number of changes allowed (default: 25)
+   - `OPEN_ISSUE_ON_FAILURE` - Set to `true` to create issues on failures
+   - `REPO_FOR_ISSUES` - Repository for failure issues (format: `owner/repo`)
+   - `ISSUE_ASSIGNEE` - GitHub username to assign issues to
+   - `TEST_MODE` - Set to `true` to preview changes without applying
+   - `ADD_MEMBER` - Set to `true` to add users to org if not already members
+   - `SYNCMAP_YML` - Custom mapping configuration (entire syncmap.yml content)
+   - `SYNCMAP_ONLY` - Set to `true` to sync only teams in syncmap.yml
+
+3. **Schedule**: The workflow runs hourly by default. Edit the cron expression in `.github/workflows/sync-teams.yml` to change the schedule.
+
+4. **Manual trigger**: You can manually trigger the sync from the Actions tab, with an option to enable test mode.
+
+### Option 2: Run as a webhook server
+
 This example runs the app in a standard Flask environment.
 
 ```bash
 pipenv run flask run --host=0.0.0.0 --port=5000
 ```
 
-Or you can run the app with Python directly.
+### Option 3: Run as a one-time script
+
+Or you can run the app with Python directly for a one-time sync.
 
 ```bash
 pipenv run python app.py

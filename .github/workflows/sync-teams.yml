@@ -1,0 +1,185 @@
+---
+###################################
+###################################
+## GitHub Team Sync Workflow    ##
+###################################
+###################################
+name: Sync GitHub Teams
+
+#
+# Documentation:
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions
+#
+
+#############################
+# Run on schedule or manual #
+#############################
+on:
+  # Run on a schedule (default: hourly at minute 0)
+  schedule:
+    - cron: '0 * * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Run in test mode (show changes without applying)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+###############
+# Set the Job #
+###############
+jobs:
+  sync:
+    name: Sync Teams
+    runs-on: ubuntu-latest
+    
+    steps:
+      ##########################
+      # Checkout the code base #
+      ##########################
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      ###############################
+      # Set up Python environment  #
+      ###############################
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+      
+      ##########################
+      # Install dependencies   #
+      ##########################
+      - name: Install pipenv
+        run: pip install pipenv
+      
+      - name: Install dependencies
+        run: pipenv install --deploy
+
+      ####################################
+      # Create private key file from secret
+      ####################################
+      - name: Create private key file
+        run: |
+          mkdir -p .ssh
+          echo "${{ secrets.GITHUB_APP_PRIVATE_KEY }}" > .ssh/team-sync.pem
+          chmod 600 .ssh/team-sync.pem
+
+      ####################################
+      # Create Google Workspace credentials file if needed
+      ####################################
+      - name: Create Google Workspace credentials file
+        if: env.USER_DIRECTORY == 'GOOGLE_WORKSPACE' && secrets.GOOGLE_WORKSPACE_SA_CREDS != ''
+        run: |
+          echo "${{ secrets.GOOGLE_WORKSPACE_SA_CREDS }}" > googleAuth.json
+          chmod 600 googleAuth.json
+        env:
+          USER_DIRECTORY: ${{ secrets.USER_DIRECTORY }}
+
+      ####################################
+      # Create syncmap.yml if configured
+      ####################################
+      - name: Create syncmap.yml
+        if: secrets.SYNCMAP_YML != ''
+        run: |
+          echo "${{ secrets.SYNCMAP_YML }}" > syncmap.yml
+
+      ##########################
+      # Run the sync           #
+      ##########################
+      - name: Run team sync
+        env:
+          # GitHub App settings
+          APP_ID: ${{ secrets.APP_ID }}
+          PRIVATE_KEY_PATH: .ssh/team-sync.pem
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+          GHE_HOST: ${{ secrets.GHE_HOST }}
+          VERIFY_SSL: ${{ secrets.VERIFY_SSL }}
+          
+          # User Directory settings
+          USER_DIRECTORY: ${{ secrets.USER_DIRECTORY }}
+          USER_SYNC_ATTRIBUTE: ${{ secrets.USER_SYNC_ATTRIBUTE }}
+          
+          # LDAP settings (if using LDAP/Active Directory)
+          LDAP_SERVER_HOST: ${{ secrets.LDAP_SERVER_HOST }}
+          LDAP_SERVER_PORT: ${{ secrets.LDAP_SERVER_PORT }}
+          LDAP_BASE_DN: ${{ secrets.LDAP_BASE_DN }}
+          LDAP_USER_BASE_DN: ${{ secrets.LDAP_USER_BASE_DN }}
+          LDAP_GROUP_BASE_DN: ${{ secrets.LDAP_GROUP_BASE_DN }}
+          LDAP_USER_FILTER: ${{ secrets.LDAP_USER_FILTER }}
+          LDAP_USER_ATTRIBUTE: ${{ secrets.LDAP_USER_ATTRIBUTE }}
+          LDAP_USER_MAIL_ATTRIBUTE: ${{ secrets.LDAP_USER_MAIL_ATTRIBUTE }}
+          LDAP_GROUP_FILTER: ${{ secrets.LDAP_GROUP_FILTER }}
+          LDAP_GROUP_MEMBER_ATTRIBUTE: ${{ secrets.LDAP_GROUP_MEMBER_ATTRIBUTE }}
+          LDAP_BIND_USER: ${{ secrets.LDAP_BIND_USER }}
+          LDAP_BIND_PASSWORD: ${{ secrets.LDAP_BIND_PASSWORD }}
+          LDAP_SEARCH_PAGE_SIZE: ${{ secrets.LDAP_SEARCH_PAGE_SIZE }}
+          
+          # Azure AD settings (if using Azure AD)
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_APP_SCOPE: ${{ secrets.AZURE_APP_SCOPE }}
+          AZURE_API_ENDPOINT: ${{ secrets.AZURE_API_ENDPOINT }}
+          AZURE_USERNAME_ATTRIBUTE: ${{ secrets.AZURE_USERNAME_ATTRIBUTE }}
+          AZURE_USER_IS_UPN: ${{ secrets.AZURE_USER_IS_UPN }}
+          AZURE_USE_TRANSITIVE_GROUP_MEMBERS: ${{ secrets.AZURE_USE_TRANSITIVE_GROUP_MEMBERS }}
+          
+          # Google Workspace settings (if using Google Workspace)
+          GOOGLE_WORKSPACE_SA_CREDS_FILE: googleAuth.json
+          GOOGLE_WORKSPACE_ADMIN_EMAIL: ${{ secrets.GOOGLE_WORKSPACE_ADMIN_EMAIL }}
+          GOOGLE_WORKSPACE_USERNAME_CUSTOM_SCHEMA_NAME: ${{ secrets.GOOGLE_WORKSPACE_USERNAME_CUSTOM_SCHEMA_NAME }}
+          GOOGLE_WORKSPACE_USERNAME_FIELD: ${{ secrets.GOOGLE_WORKSPACE_USERNAME_FIELD }}
+          GOOGLE_WORKSPACE_USER_MAIL_ATTRIBUTE: ${{ secrets.GOOGLE_WORKSPACE_USER_MAIL_ATTRIBUTE }}
+          
+          # Okta settings (if using Okta)
+          OKTA_ORG_URL: ${{ secrets.OKTA_ORG_URL }}
+          OKTA_USERNAME_ATTRIBUTE: ${{ secrets.OKTA_USERNAME_ATTRIBUTE }}
+          OKTA_ACCESS_TOKEN: ${{ secrets.OKTA_ACCESS_TOKEN }}
+          OKTA_AUTH_METHOD: ${{ secrets.OKTA_AUTH_METHOD }}
+          OKTA_CLIENT_ID: ${{ secrets.OKTA_CLIENT_ID }}
+          OKTA_SCOPES: ${{ secrets.OKTA_SCOPES }}
+          OKTA_PRIVATE_KEY: ${{ secrets.OKTA_PRIVATE_KEY }}
+          
+          # OneLogin settings (if using OneLogin)
+          ONELOGIN_CLIENT_ID: ${{ secrets.ONELOGIN_CLIENT_ID }}
+          ONELOGIN_CLIENT_SECRET: ${{ secrets.ONELOGIN_CLIENT_SECRET }}
+          REGION: ${{ secrets.REGION }}
+          
+          # Keycloak settings (if using Keycloak)
+          KEYCLOAK_USERNAME: ${{ secrets.KEYCLOAK_USERNAME }}
+          KEYCLOAK_PASSWORD: ${{ secrets.KEYCLOAK_PASSWORD }}
+          KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
+          KEYCLOAK_ADMIN_REALM: ${{ secrets.KEYCLOAK_ADMIN_REALM }}
+          KEYCLOAK_USE_GITHUB_IDP: ${{ secrets.KEYCLOAK_USE_GITHUB_IDP }}
+          
+          # Additional settings
+          CHANGE_THRESHOLD: ${{ secrets.CHANGE_THRESHOLD }}
+          OPEN_ISSUE_ON_FAILURE: ${{ secrets.OPEN_ISSUE_ON_FAILURE }}
+          REPO_FOR_ISSUES: ${{ secrets.REPO_FOR_ISSUES }}
+          ISSUE_ASSIGNEE: ${{ secrets.ISSUE_ASSIGNEE }}
+          ADD_MEMBER: ${{ secrets.ADD_MEMBER }}
+          REMOVE_ORG_MEMBERS_WITHOUT_TEAM: ${{ secrets.REMOVE_ORG_MEMBERS_WITHOUT_TEAM }}
+          SYNCMAP_ONLY: ${{ secrets.SYNCMAP_ONLY }}
+          EMU_SHORTCODE: ${{ secrets.EMU_SHORTCODE }}
+          
+          # Test mode (use workflow input if provided, otherwise use secret)
+          TEST_MODE: ${{ github.event.inputs.test_mode || secrets.TEST_MODE || 'false' }}
+        run: |
+          pipenv run python app.py
+
+      ##########################
+      # Clean up secrets       #
+      ##########################
+      - name: Clean up
+        if: always()
+        run: |
+          rm -f .ssh/team-sync.pem
+          rm -f googleAuth.json
