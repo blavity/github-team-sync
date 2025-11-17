@@ -23,7 +23,7 @@ jobs:
           echo "$HOME/.trunk/bin" >> $GITHUB_PATH
 
       - name: Run Trunk Autofix
-        run: trunk fmt --write .
+        run: trunk fmt .
 
       - name: Trunk Code Review & Lint
         run: trunk check
