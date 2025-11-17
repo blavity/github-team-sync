@@ -1,13 +1,42 @@
 name: "CodeQL analysis"
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '30 1 * * 0' # Weekly scan
 
 jobs:
-  build:
+  codeql-analyze:
+    name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write # Needed for uploading SARIF
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['python']
+        build-mode: ['autobuild'] # Use manual here if needed
+
     steps:
-    - uses: actions/checkout@v2
-    - uses: github/codeql-action/init@v4.31.3
-      with:
-        languages: python
-    - uses: github/codeql-action/analyze@v4.31.3
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4.31.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+          # config-file: .github/codeql-config.yaml # If using custom queries
+
+      # If you need a manual build, add your build steps here
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4.31.3
+        with:
+          category: "/language:${{ matrix.language }}"
+
+      # SARIF reports are uploaded automatically by the 'analyze' step.
