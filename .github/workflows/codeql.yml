@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         language: ['python']
-        build-mode: ['autobuild'] # Use manual here if needed
+        build-mode: ['none'] # Use manual here if needed
 
     steps:
       - name: Checkout repository
