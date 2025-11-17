@@ -1,9 +1,9 @@
 import asyncio
-import os
 import logging
+import os
 import re
-from okta.client import Client as OktaClient
 
+from okta.client import Client as OktaClient
 
 LOG = logging.getLogger(__name__)
 

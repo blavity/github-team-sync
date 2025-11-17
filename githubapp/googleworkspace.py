@@ -1,11 +1,12 @@
-import os
-import traceback
-import sys
 import json
 import logging
-from google.oauth2 import service_account
-import googleapiclient.discovery
+import os
+import sys
+import traceback
 from pprint import pprint
+
+import googleapiclient.discovery
+from google.oauth2 import service_account
 
 LOG = logging.getLogger(__name__)
 

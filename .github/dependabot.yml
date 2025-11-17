@@ -16,7 +16,6 @@ updates:
       interval: "daily"
     open-pull-requests-limit: 10
 
-
   # Maintain dependencies for docker
   - package-ecosystem: "docker"
     directory: "/"

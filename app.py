@@ -1,28 +1,28 @@
 import atexit
-from operator import truediv
-import os
-import time
 import json
-import github3
-from distutils.util import strtobool
-import threading
+import os
 import sys
+import threading
+import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
+from distutils.util import strtobool
+from operator import truediv
 
+import github3
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import Flask
 
 from githubapp import (
-    GitHubApp,
-    DirectoryClient,
-    CRON_INTERVAL,
-    TEST_MODE,
     ADD_MEMBER,
+    CRON_INTERVAL,
     REMOVE_ORG_MEMBERS_WITHOUT_TEAM,
-    USER_SYNC_ATTRIBUTE,
     SYNCMAP_ONLY,
+    TEST_MODE,
+    USER_SYNC_ATTRIBUTE,
+    DirectoryClient,
+    GitHubApp,
 )
 
 app = Flask(__name__)
@@ -258,7 +258,7 @@ def load_custom_map(file="syncmap.yml"):
     ignore_users = []
     group_prefix = []
     if os.path.isfile(file):
-        from yaml import load, Loader
+        from yaml import Loader, load
 
         with open(file, "r") as f:
             data = load(f, Loader=Loader)

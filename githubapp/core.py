@@ -1,12 +1,13 @@
 """
 Flask extension for rapid GitHub app development
 """
-import os.path
+
+import distutils
 import hmac
 import logging
-import distutils
+import os.path
 
-from flask import abort, current_app, jsonify, request, _app_ctx_stack
+from flask import _app_ctx_stack, abort, current_app, jsonify, request
 from github3 import GitHub, GitHubEnterprise
 
 LOG = logging.getLogger(__name__)
@@ -90,6 +91,7 @@ class GitHubApp(object):
         )
 
         app.add_url_rule("/health_check", endpoint="health_check")
+
         @app.endpoint("health_check")
         def health_check():
             return "Web server is running.", 200

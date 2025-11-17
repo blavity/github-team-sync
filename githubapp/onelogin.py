@@ -1,5 +1,6 @@
-from onelogin.api.client import OneLoginClient
 import os
+
+from onelogin.api.client import OneLoginClient
 
 
 class OneLogin:
