@@ -13,20 +13,21 @@ on:
 jobs:
   trunk-quality:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
       
       - name: Install Trunk
-        run: |
-          curl -fsSL https://get.trunk.io -o- | bash
-          echo "$HOME/.trunk/bin" >> $GITHUB_PATH
+        uses: trunk-io/trunk-action/setup@v1
 
       - name: Run Trunk Autofix
         run: trunk fmt .
 
       - name: Trunk Code Review & Lint
-        run: trunk check
+        uses: trunk-io/trunk-action@v1
 
       # Optionally commit autofixes
       - name: Commit changes
