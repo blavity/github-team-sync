@@ -35,5 +35,6 @@ jobs:
           default_author: github_actions
           committer_name: GitHub Actions
           committer_email: actions@github.com
+          message: 'Apply Trunk autofixes'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
