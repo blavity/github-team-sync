@@ -1,11 +1,14 @@
 # Contributing
+
 :wave: Hi there!
 We're thrilled that you'd like to contribute to this project. Your help is essential for keeping it great.
 
 ## Submitting a pull request
+
 [Pull Requests][pulls] are used for adding new functionality, fixing bugs, improving documentation, and improving the developer experience overall.
 
 **With write access**
+
 1. Clone the repository (only if you do not have write access)
 1. Run `pipenv install`
 1. Create a new branch: `git checkout -b <username>/<my-branch-name>`
@@ -16,6 +19,7 @@ We're thrilled that you'd like to contribute to this project. Your help is essen
 1. Pat yourself on the back and wait for your pull request to be reviewed and merged.
 
 **Without write access**
+
 1. [Fork][fork] and clone the repository
 1. Run `pipenv install`
 1. Create a new branch: `git checkout -b <username>/<my-branch-name>`
@@ -38,6 +42,7 @@ Work in Progress pull requests are also welcome to get feedback early on, or if 
 - Open a pull request and request a review from a member of the appropriate `@github/ps-delivery` and/or `@github/ps-devops-engineering` teams
 
 ## Resources
+
 - [How to Contribute to Open Source](https://opensource.guide/how-to-contribute/)
 - [Using Pull Requests](https://help.github.com/articles/about-pull-requests/)
 - [GitHub Help](https://help.github.com)

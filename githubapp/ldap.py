@@ -1,12 +1,13 @@
-import os
-import traceback
-import sys
 import json
 import logging
+import os
 import ssl
-from ldap3 import Server, Connection, Tls, ALL
-from ldap3.utils.conv import escape_filter_chars
+import sys
+import traceback
 from pprint import pprint
+
+from ldap3 import ALL, Connection, Server, Tls
+from ldap3.utils.conv import escape_filter_chars
 
 LOG = logging.getLogger(__name__)
 

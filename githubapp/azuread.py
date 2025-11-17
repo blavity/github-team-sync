@@ -1,9 +1,10 @@
-import os
 import json
 import logging
+import os
 from distutils.util import strtobool
-import requests
+
 import msal
+import requests
 
 # Optional logging
 # logging.basicConfig(level=logging.DEBUG)  # Enable DEBUG log for entire script
